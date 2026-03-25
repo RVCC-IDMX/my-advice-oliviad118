@@ -1,22 +1,140 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Advice</title>
+    <title>Olivia's Anime Finder 🎌</title>
     <link rel="stylesheet" href="/src/css/style.css" />
   </head>
   <body>
     <header>
-      <h1>My advice</h1>
+      <h1>Olivia's Anime Finder 🎌</h1>
+      <p class="subtitle">Find your next anime obsession!</p>
     </header>
 
     <main>
-      <p id="message"></p>
+      <section class="form-section">
+        <h2>Tell me your preferences</h2>
+        <form id="anime-form">
+          <div class="form-group">
+            <label for="genre">What genre are you in the mood for?</label>
+            <select id="genre" name="genre">
+              <option value="">Any genre</option>
+              <option value="action">⚔️ Action</option>
+              <option value="romance">💗 Romance</option>
+              <option value="comedy">😂 Comedy</option>
+              <option value="horror">👻 Horror</option>
+              <option value="slice-of-life">🏡 Slice of Life</option>
+              <option value="fantasy">🐉 Fantasy</option>
+              <option value="sci-fi">🚀 Sci-Fi</option>
+              <option value="thriller">🔪 Thriller</option>
+              <option value="sports">⚽ Sports</option>
+              <option value="mecha">🤖 Mecha</option>
+              <option value="isekai">🌀 Isekai</option>
+              <option value="supernatural">✨ Supernatural</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="mood">What's your mood right now?</label>
+            <select id="mood" name="mood">
+              <option value="">Any mood</option>
+              <option value="lighthearted">Lighthearted</option>
+              <option value="dark">Dark</option>
+              <option value="emotional">Emotional</option>
+              <option value="exciting">Exciting</option>
+              <option value="relaxing">Relaxing</option>
+              <option value="intense">Intense</option>
+              <option value="uplifting">Uplifting</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="audio-language">Sub or dub?</label>
+            <select id="audio-language" name="audio-language">
+              <option value="">Any</option>
+              <option value="sub">Sub (Japanese with subtitles)</option>
+              <option value="dub">Dub (English audio)</option>
+              <option value="both">Both available</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="rating">What rating level?</label>
+            <select id="rating" name="rating">
+              <option value="">Any rating</option>
+              <option value="kids">Kids</option>
+              <option value="teen">Teen</option>
+              <option value="mature">Mature</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="completion-status"
+              >Do you prefer completed series?</label
+            >
+            <select id="completion-status" name="completion-status">
+              <option value="">Any status</option>
+              <option value="completed">Completed</option>
+              <option value="ongoing">Ongoing</option>
+              <option value="hiatus">Hiatus</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="max-episodes">How long of a series?</label>
+            <select id="max-episodes" name="max-episodes">
+              <option value="">Any length</option>
+              <option value="12">Short (1-12 episodes)</option>
+              <option value="26">Medium (13-26 episodes)</option>
+              <option value="50">Long (27-50 episodes)</option>
+              <option value="999">Very long (50+ episodes)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="max-episode-length">How long are the episodes?</label>
+            <select id="max-episode-length" name="max-episode-length">
+              <option value="">Any length</option>
+              <option value="20">Short (≤20 min)</option>
+              <option value="25">Standard (21-25 min)</option>
+              <option value="999">Long (26+ min)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="min-rating">Show me only highly-rated anime?</label>
+            <select id="min-rating" name="min-rating">
+              <option value="">Any rating</option>
+              <option value="3">3+ stars</option>
+              <option value="4">4+ stars</option>
+              <option value="5">5 stars only</option>
+            </select>
+          </div>
+
+          <div class="button-group">
+            <button type="submit" class="btn-primary">Find My Anime!</button>
+            <button type="reset" class="btn-secondary">
+              Clear All Filters
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <section class="results-section">
+        <h2>Your Recommendations</h2>
+        <div id="recommendation-list">
+          <p class="placeholder">
+            Choose your preferences and click "Find My Anime!" to discover your
+            next obsession! 🎌
+          </p>
+        </div>
+      </section>
     </main>
 
     <footer>
-      <p>&copy; 2026</p>
+      <p>&copy; 2026 Olivia's Anime Finder</p>
     </footer>
 
     <script type="module" src="/src/js/app.js"></script>

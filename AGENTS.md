@@ -60,4 +60,12 @@ src/css/style.css    ← all styles
 
 ## My personal instructions
 
-_(Add your own here — what helps you learn, what you want the agent to always or never do, context about your project.)_
+- **Explain concepts first, then show code.** Before implementing something new, explain the concept using an analogy or connecting it to something I already know. Then show the code. This helps me build a mental model.
+
+- **Analogies are helpful.** When explaining a programming concept, use analogies to real-world things. They make abstract ideas click for me.
+
+- **Write code comments in my voice.** Use first-person comments that sound like my learning journey: "I learned...", "This was confusing at first...", "This was my breakthrough moment!" Be enthusiastic and honest about mistakes and discoveries.
+
+- **Step-by-step explanations for errors.** If something breaks, explain what went wrong and why, step by step. Don't just fix it silently. I learn more from understanding the problem than from seeing the solution.
+
+- **Ask questions up front, then move confidently.** Ask clarifying questions before building something new, but once the plan is clear, move forward and implement without asking permission for every small decision. The pace you set today worked perfectly.
