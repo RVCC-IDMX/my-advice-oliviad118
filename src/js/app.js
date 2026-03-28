@@ -141,22 +141,58 @@ function createAnimeCard(anime) {
   const episodeDisplay = formatEpisodeCount(anime.episodeCount);
   const stars = '⭐'.repeat(anime.userRating);
 
-  // Build the card content
-  // I'm using innerHTML here because it's all hard-coded template content (safe!)
-  // Prof. Teeters said: "innerHTML is fine for templates, but use textContent for user input"
-  card.innerHTML = `
-    <h3>${genreEmoji} ${anime.name}</h3>
-    <div class="anime-details">
-      <p><strong>Genre:</strong> ${anime.genre}</p>
-      <p><strong>Mood:</strong> ${anime.mood}</p>
-      <p><strong>Audio:</strong> ${anime.audioLanguage}</p>
-      <p><strong>Rating:</strong> ${anime.rating}</p>
-      <p><strong>Status:</strong> ${anime.completionStatus}</p>
-      <p><strong>Length:</strong> ${episodeDisplay} (${anime.episodeLengthMinutes} min each)</p>
-      <p><strong>My Rating:</strong> ${stars} (${anime.userRating}/5)</p>
-    </div>
-    <p class="description">${description}</p>
-  `;
+  // Build the card content using safe DOM methods
+  // I learned: createElement + textContent is safer than innerHTML when displaying data
+  // This was my breakthrough moment! Even though my data comes from data.js (not user input),
+  // using textContent is the defensive pattern - it never interprets HTML
+
+  // Create the heading with emoji and name
+  const heading = document.createElement('h3');
+  heading.textContent = `${genreEmoji} ${anime.name}`;
+  card.appendChild(heading);
+
+  // Create the details container
+  const detailsDiv = document.createElement('div');
+  detailsDiv.className = 'anime-details';
+
+  // Helper function to create a detail paragraph
+  // This was confusing at first - a function inside a function! But it makes sense:
+  // I was repeating the same pattern 7 times, so I made a helper
+  function createDetailParagraph(label, value) {
+    const p = document.createElement('p');
+    const strong = document.createElement('strong');
+    strong.textContent = `${label}: `;
+    p.appendChild(strong);
+    // This part creates a text node for the value
+    p.appendChild(document.createTextNode(value));
+    return p;
+  }
+
+  // Add all the detail paragraphs
+  detailsDiv.appendChild(createDetailParagraph('Genre', anime.genre));
+  detailsDiv.appendChild(createDetailParagraph('Mood', anime.mood));
+  detailsDiv.appendChild(createDetailParagraph('Audio', anime.audioLanguage));
+  detailsDiv.appendChild(createDetailParagraph('Rating', anime.rating));
+  detailsDiv.appendChild(
+    createDetailParagraph('Status', anime.completionStatus)
+  );
+  detailsDiv.appendChild(
+    createDetailParagraph(
+      'Length',
+      `${episodeDisplay} (${anime.episodeLengthMinutes} min each)`
+    )
+  );
+  detailsDiv.appendChild(
+    createDetailParagraph('My Rating', `${stars} (${anime.userRating}/5)`)
+  );
+
+  card.appendChild(detailsDiv);
+
+  // Create the description paragraph
+  const descriptionP = document.createElement('p');
+  descriptionP.className = 'description';
+  descriptionP.textContent = description;
+  card.appendChild(descriptionP);
 
   return card;
 }
