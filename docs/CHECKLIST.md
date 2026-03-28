@@ -1,49 +1,52 @@
-# Completion checklist
+# Completion checklist — Week 2: DOM Fundamentals
 
 Use this checklist to make sure you have completed every part of the assignment. Each item should be a clear yes or no.
 
-## Part 1 — Plan your site with your agent
+## Part 1 — Read your code
 
-- [ ] Opened original "What Should I...?" repo in VS Code
-- [ ] Started a Copilot agent conversation (in the original repo, not this one) with the planning guide gist
-- [ ] Agent's first response referenced specific files and content from the repo
-- [ ] Had a back-and-forth planning conversation (not just one message)
-- [ ] Produced a `BUILD-PROMPT.md` file
-- [ ] Copied `BUILD-PROMPT.md` into this repo
+- [ ] Updated AGENTS.md "About this student" section before starting (start-of-week ritual)
+- [ ] Ran `npm run dev` and confirmed site loads
+- [ ] Read `src/js/app.js` top to bottom — can explain what each function does
+- [ ] Read `src/js/matching.js` — can explain the logic
+- [ ] Read `src/js/data.js` — know the shape and count of your data
+- [ ] Tried `document.querySelector()` in the browser console
 
-## Part 2 — Get it running
+## Part 2 — Modernize your code
 
-- [ ] Cloned the repo and opened it in VS Code
-- [ ] Ran `npm install` successfully
-- [ ] Ran `npm run dev` — Vite started without errors
-- [ ] Ran `npm run lint` — passed with no errors
-- [ ] Made a test commit and confirmed Husky ran lint-staged
-
-## Part 3 — Build the site
-
-- [ ] Pasted build prompt into an agent conversation in this repo
-- [ ] Agent generated `index.html`
-- [ ] Agent generated JS files in `src/js/` and CSS in `src/css/`
+- [ ] Replaced every `getElementById` with `querySelector` (using CSS selector syntax)
+- [ ] Replaced every data-driven `innerHTML` with `createElement` + `textContent`
+- [ ] Any remaining `innerHTML` has a comment explaining why it is safe
+- [ ] Site still works after changes — form submits, results display
 - [ ] Ran `npm run lint` and fixed any errors
-- [ ] Ran `npm run dev` and confirmed the site loads
+- [ ] Updated `docs/error-log.md` with any errors encountered
 
-## Part 4 — Modify your AGENTS.md
+## Part 3 — DOM experiments
 
-- [ ] Read `docs/a-good-agents-md.md`
-- [ ] Added at least 3 personal instructions to AGENTS.md
-- [ ] Tested the instructions in a short agent conversation
-- [ ] Noted what changed in the agent's behavior
+- [ ] Created `src/js/experiments.js`
+- [ ] Linked it in `index.html` with a `<script type="module">` tag
+- [ ] Completed at least 5 experiments from `docs/tutorials/dom-experiments.md`
+- [ ] Each experiment is commented — what it does and why you tried it
+- [ ] Ran `npm run lint` and fixed any errors
+- [ ] Updated `docs/error-log.md`
 
-## Part 5 — Deploy and reflect
+## Part 4 — Update AGENTS.md and reflect
 
-- [ ] Ran `npm run build` successfully
+- [ ] Updated "About this student" section again with what you actually learned
+- [ ] Added at least 2 new personal instructions based on this week's learning
+- [ ] Completed `docs/reflections/week-2-reflection.md`
+- [ ] Ran `npm run lint` — passes
+- [ ] Ran `npm run build` — builds successfully
 - [ ] Deployed to Netlify
 - [ ] Pushed to GitHub
-- [ ] GitHub Actions lint workflow shows a green check
-- [ ] Completed `ai-collaboration-summary-template.md`
+- [ ] GitHub Actions lint check shows green
 
-## Files to submit
+## What to submit
 
 - [ ] Live Netlify URL
 - [ ] GitHub repo URL
-- [ ] Completed `ai-collaboration-summary-template.md` in the repo
+- [ ] 2–3 sentence Canvas answer: What was the most surprising thing you discovered when reading the code the agent wrote for you?
+
+## Extra credit
+
+- [ ] Write one Vitest test for a pure function in `matching.js`
+- [ ] Run `npm run test` and confirm it passes
