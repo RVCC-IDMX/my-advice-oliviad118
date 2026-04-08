@@ -2,9 +2,9 @@
 
 ## About this student
 
-JavaScript student, post-midterm. **Currently learning: DOM manipulation** — `querySelector`, `createElement`, `textContent`, safe DOM methods.
+JavaScript student, post-midterm. **Currently learning: Events & view functions** — `addEventListener`, event delegation, view patterns (`showResults`, `showDetail`, `showNoResults`), SPA (single-page app) with multiple views in one HTML file.
 
-Previously learned: `const`/`let`, template literals, `if/else`, arrays, objects, JSON, ES modules (`import`/`export`), npm, git, Netlify, professional dev tooling (Vite, ESLint, Prettier, Husky).
+Previously learned: `const`/`let`, template literals, `if/else`, arrays, objects, JSON, ES modules (`import`/`export`), npm, git, Netlify, professional dev tooling (Vite, ESLint, Prettier, Husky), DOM manipulation (`querySelector`, `createElement`, `textContent`).
 
 Has NOT done: async, Promises, `fetch()`, APIs yet.
 
@@ -26,6 +26,13 @@ Has NOT done: async, Promises, `fetch()`, APIs yet.
 - No `eval()`; `console.log` is allowed for debugging during development
 - No `fetch()`, `async`, `await`, or Promises — all data must come from the local `data.js` array
 - Logic functions (filtering, matching, data) must not touch the DOM — keep them testable
+- Use `addEventListener` — never `onclick`
+- Use `append` — never `appendChild`
+- Use `for...of` — never `forEach` when you need `break`/`continue`
+- Use `dataset` — never `getAttribute`/`setAttribute` for data attributes
+- Use `.find()` — never `.filter()[0]`
+- Use `.includes()` — never `.indexOf() !== -1`
+- Use `classList.toggle()` to switch classes on and off
 
 ### HTML
 
