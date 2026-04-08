@@ -11,17 +11,30 @@
 // Import the data and all the functions I need
 import { data } from './data.js';
 import { meetsAllCriteria } from './matching.js';
-import { showResults, showNoResults } from './views.js';
+import { showResults, showNoResults, showDetail } from './views.js';
 
 // Get the form and results container
 const form = document.querySelector('#anime-form');
 const resultsList = document.querySelector('#recommendation-list');
 
+// Store the last search results so we can restore them when user clicks back
+// I learned: Module-level variables persist across function calls!
+let lastResults = [];
+
 /**
  * Handles form submission - the main event!
  * This runs when the user clicks "Find My Anime!"
+ *
+ * What this does:
+ * 1. Prevents the default form submission (which would reload the page)
+ * 2. Gathers all form values from the 8 select dropdowns
+ * 3. Converts string numbers to actual numbers (form values are always strings!)
+ * 4. Filters the anime dataset to find matches
+ * 5. Displays the results using view functions
+ *
+ * I learned: This is the heart of the app - it connects user input to filtered results!
  */
-form.addEventListener('submit', function (event) {
+function handleFormSubmit(event) {
   // This was confusing at first! preventDefault stops the page from reloading
   // Without it, the form would submit and refresh the whole page
   event.preventDefault();
@@ -55,7 +68,11 @@ form.addEventListener('submit', function (event) {
   // Find matching anime and display them!
   const recommendations = findRecommendations(preferences);
   displayRecommendations(recommendations);
-});
+}
+
+// Wire up the form submit event
+// I learned: Named functions are better than anonymous functions for event handlers!
+form.addEventListener('submit', handleFormSubmit);
 
 /**
  * Finds all anime that match the user's preferences
@@ -93,6 +110,9 @@ function findRecommendations(preferences) {
  * @param {Array} recommendations - Array of anime objects to display
  */
 function displayRecommendations(recommendations) {
+  // Save the results so we can restore them when user clicks back from detail view
+  lastResults = recommendations;
+
   // I learned: View functions handle the rendering, app.js just coordinates!
   if (recommendations.length === 0) {
     showNoResults(resultsList);
@@ -101,13 +121,74 @@ function displayRecommendations(recommendations) {
   }
 }
 
+/**
+ * Handles clicks on recommendation cards
+ * Uses event delegation - one listener on the container handles all card clicks!
+ *
+ * I learned: Event delegation is more efficient than adding listeners to every card.
+ * The click bubbles up from the card to the container, and we can catch it there.
+ */
+function handleCardClick(event) {
+  // Find the closest .recommendation-card ancestor
+  // This works even if the user clicks on text inside the card!
+  const card = event.target.closest('.recommendation-card');
+
+  // If the click wasn't on a card, ignore it
+  if (!card) return;
+
+  // Get the anime name from the data-name attribute
+  // I learned: dataset automatically converts data-name to dataset.name (camelCase!)
+  const animeName = card.dataset.name;
+
+  // Find the full anime object by name
+  // I learned: .find() is perfect for this - stops at the first match!
+  const anime = data.options.find((item) => item.name === animeName);
+
+  // If we found it, show the detail view
+  if (anime) {
+    showDetail(anime, resultsList);
+  }
+}
+
+/**
+ * Handles clicks on the back button in detail view
+ * Restores the last search results
+ *
+ * I learned: We can check event.target.id to see what was clicked!
+ */
+function handleBackClick(event) {
+  // Only respond to clicks on the back button
+  if (event.target.id === 'back-to-results') {
+    // Restore the last results
+    // I learned: lastResults persists because it's a module-level variable!
+    if (lastResults.length > 0) {
+      showResults(lastResults, resultsList);
+    }
+  }
+}
+
+// Add event delegation listeners to the results container
+// I learned: One listener handles both card clicks AND back button clicks!
+resultsList.addEventListener('click', handleCardClick);
+resultsList.addEventListener('click', handleBackClick);
+
 // I made the mistake of forgetting to handle the reset button at first!
 // When the user clicks "Clear All Filters", I want to also clear the results
-form.addEventListener('reset', function () {
+/**
+ * Handles the form reset button
+ * Clears the results and shows the placeholder message
+ */
+function handleFormReset() {
   // A small delay lets the form reset first, then we clear results
+  // I learned: setTimeout with 0ms pushes this to the end of the event queue!
   setTimeout(function () {
     // Safe: innerHTML with hardcoded string, zero variables, no data insertion
     resultsList.innerHTML =
       '<p class="placeholder">Choose your preferences and click "Find My Anime!" to discover your next obsession! 🎌</p>';
+    // Clear the stored results too
+    lastResults = [];
   }, 0);
-});
+}
+
+// Wire up the reset event
+form.addEventListener('reset', handleFormReset);
