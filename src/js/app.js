@@ -125,6 +125,10 @@ function displayRecommendations(recommendations) {
     const card = createAnimeCard(anime);
     resultsList.appendChild(card);
   }
+
+  // Add numbered badges to help users reference specific recommendations
+  // I learned: This runs after cards exist in the DOM!
+  addCardBadges();
 }
 
 /**
@@ -196,6 +200,27 @@ function createAnimeCard(anime) {
   card.appendChild(descriptionP);
 
   return card;
+}
+
+/**
+ * Adds numbered badges to all recommendation cards
+ * This helps users reference specific recommendations ("I loved #3!")
+ * I learned: This function queries the DOM after cards are already created
+ */
+function addCardBadges() {
+  const cards = document.querySelectorAll('.recommendation-card');
+
+  // Add a numbered badge to each card
+  // I learned: forEach is perfect here since I need to process every card
+  cards.forEach((card, index) => {
+    const badge = document.createElement('span');
+    badge.textContent = `#${index + 1}`;
+    badge.className = 'card-badge';
+
+    // prepend adds it as the FIRST child (before the h3)
+    // This was my breakthrough: prepend vs append changes position!
+    card.prepend(badge);
+  });
 }
 
 // I made the mistake of forgetting to handle the reset button at first!
