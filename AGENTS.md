@@ -2,7 +2,7 @@
 
 ## About this student
 
-JavaScript student, post-midterm. **Currently learning: Events & view functions** — `addEventListener`, event delegation, view patterns (`showResults`, `showDetail`, `showNoResults`), SPA (single-page app) with multiple views in one HTML file.
+JavaScript student, post-midterm. **Recently completed: Events & view functions** — `addEventListener`, event delegation, view patterns (`showResults`, `showDetail`, `showNoResults`), SPA (single-page app) with multiple views in one HTML file, named callback functions, module-level state.
 
 Previously learned: `const`/`let`, template literals, `if/else`, arrays, objects, JSON, ES modules (`import`/`export`), npm, git, Netlify, professional dev tooling (Vite, ESLint, Prettier, Husky), DOM manipulation (`querySelector`, `createElement`, `textContent`).
 
@@ -65,7 +65,8 @@ Has NOT done: async, Promises, `fetch()`, APIs yet.
 ```
 src/js/data.js       ← dataset only
 src/js/matching.js   ← logic, no DOM
-src/js/app.js        ← DOM wiring only
+src/js/app.js        ← DOM wiring and event handlers
+src/js/views.js      ← view functions (rendering different screens)
 src/css/style.css    ← all styles
 ```
 
@@ -80,3 +81,9 @@ src/css/style.css    ← all styles
 - **Step-by-step explanations for errors.** If something breaks, explain what went wrong and why, step by step. Don't just fix it silently. I learn more from understanding the problem than from seeing the solution.
 
 - **Ask questions up front, then move confidently.** Ask clarifying questions before building something new, but once the plan is clear, move forward and implement without asking permission for every small decision. The pace you set today worked perfectly.
+
+- **Use named callback functions for event handlers.** When adding event listeners, define the handler as a separate named function (`handleFormSubmit`, `handleCardClick`) instead of an anonymous inline function. This makes code more readable and easier to debug. If you generate `addEventListener('click', function() {...})`, refactor it to a named function.
+
+- **Prefer event delegation over individual listeners.** When adding click handlers to multiple items (like cards in a list), add ONE listener to the parent container using `event.target.closest()` instead of adding individual listeners to each item. This is more efficient and handles dynamically added elements automatically.
+
+- **Build view functions, not separate HTML files.** For different "screens" or "pages" in the app, create view functions that take data and a container (`showResults(items, container)`) rather than suggesting separate HTML files. This is the SPA pattern — multiple views, one HTML file, no page reloads.
