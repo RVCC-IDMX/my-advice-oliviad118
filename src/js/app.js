@@ -102,6 +102,7 @@ function displayRecommendations(recommendations) {
 
   // Handle the "no results" case
   if (recommendations.length === 0) {
+    // Safe: innerHTML with hardcoded string, zero variables, no data insertion
     resultsList.innerHTML =
       '<p class="no-results">No anime match your preferences. Try adjusting your filters! 📺</p>';
     return;
@@ -202,6 +203,7 @@ function createAnimeCard(anime) {
 form.addEventListener('reset', function () {
   // A small delay lets the form reset first, then we clear results
   setTimeout(function () {
+    // Safe: innerHTML with hardcoded string, zero variables, no data insertion
     resultsList.innerHTML =
       '<p class="placeholder">Choose your preferences and click "Find My Anime!" to discover your next obsession! 🎌</p>';
   }, 0);
