@@ -86,11 +86,43 @@ function showDetail(item, container) {
   heading.textContent = `${genreEmoji} ${item.name}`;
   detailView.append(heading);
 
+  // Add poster image if available
+  // I learned: Detail view gets a bigger poster image!
+  if (item.posterImage) {
+    const poster = document.createElement('img');
+    poster.src = item.posterImage;
+    poster.alt = `${item.name} poster`;
+    poster.className = 'detail-poster';
+    detailView.append(poster);
+  }
+
   // Create the description paragraph
   const descriptionP = document.createElement('p');
   descriptionP.className = 'description';
   descriptionP.textContent = description;
   detailView.append(descriptionP);
+
+  // Add synopsis from MyAnimeList if available
+  // I learned: The API gives us rich synopsis data we can display!
+  if (item.synopsis) {
+    const synopsisHeading = document.createElement('h3');
+    synopsisHeading.textContent = 'Synopsis';
+    detailView.append(synopsisHeading);
+
+    const synopsisP = document.createElement('p');
+    synopsisP.className = 'synopsis';
+    synopsisP.textContent = item.synopsis;
+    detailView.append(synopsisP);
+  }
+
+  // Add MyAnimeList score if available
+  // I learned: malScore is out of 10, scored by real MAL users!
+  if (item.malScore) {
+    const scoreP = document.createElement('p');
+    scoreP.className = 'mal-score';
+    scoreP.textContent = `MyAnimeList Score: ${item.malScore}/10 (rated by ${item.scoredBy?.toLocaleString() || 'many'} users)`;
+    detailView.append(scoreP);
+  }
 
   // Create the details container with ALL the properties
   const detailsDiv = document.createElement('div');
@@ -163,6 +195,16 @@ function createAnimeCard(anime) {
   // I learned: createElement + textContent is safer than innerHTML when displaying data
   // This was my breakthrough moment! Even though my data comes from data.js (not user input),
   // using textContent is the defensive pattern - it never interprets HTML
+
+  // Add poster image if available
+  // I learned: MyAnimeList provides beautiful poster images for each anime!
+  if (anime.posterImage) {
+    const poster = document.createElement('img');
+    poster.src = anime.posterImage;
+    poster.alt = `${anime.name} poster`;
+    poster.className = 'anime-poster';
+    card.append(poster);
+  }
 
   // Create the heading with emoji and name
   const heading = document.createElement('h3');

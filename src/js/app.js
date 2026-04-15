@@ -24,24 +24,98 @@ let lastResults = [];
 // I need this for the detail view - when user clicks a card, I look up the full anime object
 let animeDataset = [];
 
+// Cache key and duration constants
+// I learned: Constants in UPPERCASE show they never change!
+const CACHE_KEY = 'animeData';
+const CACHE_DURATION = 60 * 60 * 1000; // 1 hour in milliseconds
+
 /**
- * Fetches anime data from the serverless function
+ * Gets anime data from localStorage cache if it's still fresh
+ * I learned: localStorage only stores strings, so I use JSON.parse to convert back to objects!
+ *
+ * @returns {Object|null} Cached data object or null if cache is expired/missing
+ */
+function getCachedData() {
+  const cached = localStorage.getItem(CACHE_KEY);
+
+  // If nothing in cache, return null
+  if (!cached) return null;
+
+  try {
+    const { data, timestamp } = JSON.parse(cached);
+
+    // Check if cache is still fresh (less than 1 hour old)
+    const age = Date.now() - timestamp;
+    if (age < CACHE_DURATION) {
+      console.log(
+        `Using cached data (${Math.round(age / 1000 / 60)} minutes old)`
+      );
+      return data;
+    }
+
+    // Cache expired, return null
+    console.log('Cache expired, fetching fresh data');
+    return null;
+  } catch (error) {
+    // If parse fails, cache is corrupted - clear it
+    console.error('Cache corrupted, clearing:', error);
+    localStorage.removeItem(CACHE_KEY);
+    return null;
+  }
+}
+
+/**
+ * Saves anime data to localStorage with a timestamp
+ * I learned: localStorage.setItem only accepts strings, so I use JSON.stringify!
+ *
+ * @param {Object} data - The anime data object to cache
+ */
+function setCachedData(data) {
+  const cacheObject = {
+    data,
+    timestamp: Date.now(),
+  };
+
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify(cacheObject));
+    console.log('Data cached successfully');
+  } catch (error) {
+    // If storage is full, log the error but don't crash
+    console.error('Failed to cache data:', error);
+  }
+}
+
+/**
+ * Fetches anime data from the serverless function OR returns cached data
  * This was my first real async function! It feels like magic.
  *
  * What this does:
- * 1. Calls fetch() to request data from the serverless function
- * 2. Waits for the response (that's what await does!)
- * 3. Checks if the response was successful (response.ok)
- * 4. Parses the JSON body (another await!)
- * 5. Returns the data object
+ * 1. Checks localStorage for cached data (< 1 hour old)
+ * 2. If cache is fresh, returns it immediately (no API call!)
+ * 3. If cache is stale/missing, calls the serverless function
+ * 4. Waits for the response (that's what await does!)
+ * 5. Checks if the response was successful (response.ok)
+ * 6. Parses the JSON body (another await!)
+ * 7. Saves the data to localStorage cache
+ * 8. Returns the data object
  *
  * I learned: Both the fetch AND the .json() call need await because they're both async!
  * I learned: fetch doesn't throw errors for 404/500, so I have to check response.ok myself!
+ * I learned: Caching saves API calls and makes the app feel instant on repeat visits!
  *
  * @returns {Promise<Object>} The anime data object with an options array
  * @throws {Error} If the fetch fails or returns a bad status
  */
 async function fetchAnimeData() {
+  // Check cache first - instant if data is fresh!
+  const cachedData = getCachedData();
+  if (cachedData) {
+    return cachedData;
+  }
+
+  // Cache miss or expired - fetch from API
+  console.log('Fetching fresh data from API');
+
   // This is the path to my serverless function
   // Netlify automatically routes /.netlify/functions/api to netlify/functions/api.mjs
   const response = await fetch('/.netlify/functions/api');
@@ -56,6 +130,10 @@ async function fetchAnimeData() {
   // Parse the JSON response body
   // I learned: .json() is also async because parsing can take time for large data!
   const data = await response.json();
+
+  // Save to cache for next time
+  setCachedData(data);
+
   return data;
 }
 
