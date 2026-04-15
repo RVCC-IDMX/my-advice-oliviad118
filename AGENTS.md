@@ -2,11 +2,9 @@
 
 ## About this student
 
-JavaScript student, post-midterm. **Recently completed: Events & view functions** — `addEventListener`, event delegation, view patterns (`showResults`, `showDetail`, `showNoResults`), SPA (single-page app) with multiple views in one HTML file, named callback functions, module-level state.
+JavaScript student, post-midterm. **Currently learning (Week 4): Async/await, fetch, serverless functions, localStorage caching** — replacing static data.js with live API data, writing serverless proxy functions, error handling with try/catch, checking response.ok, transforming API responses.
 
-Previously learned: `const`/`let`, template literals, `if/else`, arrays, objects, JSON, ES modules (`import`/`export`), npm, git, Netlify, professional dev tooling (Vite, ESLint, Prettier, Husky), DOM manipulation (`querySelector`, `createElement`, `textContent`).
-
-Has NOT done: async, Promises, `fetch()`, APIs yet.
+Previously learned (Weeks 1-3): `const`/`let`, template literals, `if/else`, arrays, objects, JSON, ES modules (`import`/`export`), npm, git, Netlify, professional dev tooling (Vite, ESLint 9 + unicorn, Prettier, Husky), DOM manipulation (`querySelector`, `createElement`, `textContent`), `addEventListener`, event delegation, view patterns (`showResults`, `showDetail`, `showNoResults`), SPA (single-page app), named callback functions, module-level state.
 
 ## How to help
 
@@ -22,9 +20,8 @@ Has NOT done: async, Promises, `fetch()`, APIs yet.
 
 - ES modules only — `import`/`export`, never `require`
 - `const` by default; `let` only when reassignment needed; never `var`
-- `textContent` for user input in DOM; `innerHTML` only for hardcoded template literals
+- `textContent` for user input in DOM; `innerHTML` is now blocked by linter everywhere (ESLint 9 + unicorn enforcement)
 - No `eval()`; `console.log` is allowed for debugging during development
-- No `fetch()`, `async`, `await`, or Promises — all data must come from the local `data.js` array
 - Logic functions (filtering, matching, data) must not touch the DOM — keep them testable
 - Use `addEventListener` — never `onclick`
 - Use `append` — never `appendChild`
@@ -33,6 +30,16 @@ Has NOT done: async, Promises, `fetch()`, APIs yet.
 - Use `.find()` — never `.filter()[0]`
 - Use `.includes()` — never `.indexOf() !== -1`
 - Use `classList.toggle()` to switch classes on and off
+
+### Async/await and fetch (Week 4+)
+
+- Always wrap fetch calls in `try/catch` — network requests can fail
+- Check `response.ok` before calling `response.json()` — fetch does not throw on 404/500
+- Mark functions that use `await` as `async`
+- Await both the fetch AND the `.json()` call — both return Promises
+- Show errors in the DOM, not just `console.error` — users need to see what went wrong
+- In serverless functions: return a 502 status with JSON error message if the upstream API fails
+- Transform API responses in the serverless function, not in the browser — keep views simple
 
 ### HTML
 
@@ -63,11 +70,12 @@ Has NOT done: async, Promises, `fetch()`, APIs yet.
 ### Files
 
 ```
-src/js/data.js       ← dataset only
-src/js/matching.js   ← logic, no DOM
-src/js/app.js        ← DOM wiring and event handlers
-src/js/views.js      ← view functions (rendering different screens)
-src/css/style.css    ← all styles
+src/js/data.js                ← static dataset (will be replaced by API data in Week 4)
+src/js/matching.js            ← logic, no DOM
+src/js/app.js                 ← DOM wiring and event handlers
+src/js/views.js               ← view functions (rendering different screens)
+src/css/style.css             ← all styles
+netlify/functions/api.mjs     ← serverless proxy function (Week 4+)
 ```
 
 ## My personal instructions
