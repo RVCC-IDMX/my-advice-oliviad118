@@ -15,6 +15,48 @@ import {
   formatEpisodeCount,
 } from './matching.js';
 
+// Favorites system - stored separately from cached anime data
+// I learned: Use a different localStorage key so favorites persist independently!
+const FAVORITES_KEY = 'animeFavorites';
+
+/**
+ * Gets the list of favorited anime IDs from localStorage
+ * @returns {Array} Array of MAL IDs that are favorited
+ */
+function getFavorites() {
+  const favorites = localStorage.getItem(FAVORITES_KEY);
+  return favorites ? JSON.parse(favorites) : [];
+}
+
+/**
+ * Checks if an anime is in the favorites list
+ * @param {number} malId - The MyAnimeList ID of the anime
+ * @returns {boolean} True if favorited
+ */
+function isFavorited(malId) {
+  const favorites = getFavorites();
+  return favorites.includes(malId);
+}
+
+/**
+ * Toggles favorite status for an anime
+ * @param {number} malId - The MyAnimeList ID of the anime
+ */
+function toggleFavorite(malId) {
+  const favorites = getFavorites();
+  const index = favorites.indexOf(malId);
+
+  if (index === -1) {
+    // Not favorited, add it
+    favorites.push(malId);
+  } else {
+    // Already favorited, remove it
+    favorites.splice(index, 1);
+  }
+
+  localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
+}
+
 /**
  * Shows a list of results as cards
  * @param {Array} items - Array of anime objects to display
@@ -124,6 +166,28 @@ function showDetail(item, container) {
     detailView.append(scoreP);
   }
 
+  // Add "Where to Watch" section
+  // I learned: Show users where they can actually watch the anime!
+  if (item.whereToWatch && item.whereToWatch.length > 0) {
+    const watchHeading = document.createElement('h3');
+    watchHeading.textContent = 'Where to Watch';
+    detailView.append(watchHeading);
+
+    const watchContainer = document.createElement('div');
+    watchContainer.className = 'where-to-watch';
+
+    // Create a badge for each platform
+    // I learned: Using badges makes platforms easy to scan visually
+    for (const platform of item.whereToWatch) {
+      const badge = document.createElement('span');
+      badge.className = 'platform-badge';
+      badge.textContent = platform;
+      watchContainer.append(badge);
+    }
+
+    detailView.append(watchContainer);
+  }
+
   // Create the details container with ALL the properties
   const detailsDiv = document.createElement('div');
   detailsDiv.className = 'anime-details-full';
@@ -184,6 +248,39 @@ function createAnimeCard(anime) {
   // Store the anime name as a data attribute for event delegation
   // I learned: data-* attributes are perfect for storing information on elements!
   card.dataset.name = anime.name;
+
+  // Add favorite heart button
+  // I learned: Favorites persist in localStorage separate from cached data!
+  if (anime.malId) {
+    const favoriteBtn = document.createElement('button');
+    favoriteBtn.className = 'favorite-btn';
+    favoriteBtn.dataset.malId = anime.malId;
+    favoriteBtn.textContent = isFavorited(anime.malId) ? '❤️' : '🤍';
+    favoriteBtn.title = isFavorited(anime.malId)
+      ? 'Remove from favorites'
+      : 'Add to favorites';
+
+    if (isFavorited(anime.malId)) {
+      favoriteBtn.classList.add('favorited');
+    }
+
+    // Handle favorite toggle
+    // I learned: event.stopPropagation prevents the card click from firing!
+    favoriteBtn.addEventListener('click', function (event) {
+      event.stopPropagation();
+      toggleFavorite(anime.malId);
+
+      // Update button appearance
+      const nowFavorited = isFavorited(anime.malId);
+      favoriteBtn.textContent = nowFavorited ? '❤️' : '🤍';
+      favoriteBtn.title = nowFavorited
+        ? 'Remove from favorites'
+        : 'Add to favorites';
+      favoriteBtn.classList.toggle('favorited', nowFavorited);
+    });
+
+    card.append(favoriteBtn);
+  }
 
   // Get all the display helpers from matching.js
   const genreEmoji = getGenreEmoji(anime.genre);

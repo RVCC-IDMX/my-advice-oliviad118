@@ -92,6 +92,54 @@ function convertScore(score) {
   return 1;
 }
 
+/**
+ * Determines likely streaming platforms based on anime patterns
+ * I learned: We can't get exact streaming data from /top/anime endpoint,
+ * but we can make educated guesses based on year, score, and type!
+ */
+function getWhereToWatch(anime) {
+  const platforms = [];
+
+  // Get the year from aired date
+  const year = anime.aired?.from
+    ? new Date(anime.aired.from).getFullYear()
+    : null;
+  const score = anime.score || 0;
+  const isPopular = anime.scored_by > 100000; // Many viewers = widely available
+
+  // Crunchyroll has the most anime (90%+ of modern anime)
+  // I learned: Crunchyroll is the biggest anime streaming platform!
+  platforms.push('Crunchyroll');
+
+  // Highly-rated or popular anime often get Netflix deals
+  if (score >= 8.0 || isPopular) {
+    platforms.push('Netflix');
+  }
+
+  // Funimation merged with Crunchyroll in 2022, but older anime might still show Funimation
+  // I learned: In 2026, most Funimation content moved to Crunchyroll
+  if (year && year < 2022) {
+    platforms.push('Funimation');
+  }
+
+  // Hulu has a decent anime library, especially popular shows
+  if (isPopular || score >= 7.5) {
+    platforms.push('Hulu');
+  }
+
+  // Amazon Prime has select anime
+  if (score >= 8.5 || (year && year >= 2020)) {
+    platforms.push('Amazon Prime Video');
+  }
+
+  // If nothing matched, at least return the most common one
+  if (platforms.length === 0) {
+    platforms.push('Crunchyroll');
+  }
+
+  return platforms;
+}
+
 export default async () => {
   try {
     // Fetch top anime from Jikan API
@@ -138,6 +186,7 @@ export default async () => {
         malScore: anime.score,
         scoredBy: anime.scored_by,
         malId: anime.mal_id,
+        whereToWatch: getWhereToWatch(anime),
       })),
     };
 

@@ -15,6 +15,12 @@ import { showResults, showNoResults, showDetail } from './views.js';
 // Get the form and results container
 const form = document.querySelector('#anime-form');
 const resultsList = document.querySelector('#recommendation-list');
+const loadingSpinner = document.querySelector('#loading-spinner');
+const refreshButton = document.querySelector('#refresh-data');
+const cacheAgeDisplay = document.querySelector('#cache-age');
+const searchInput = document.querySelector('#search-input');
+const malSlider = document.querySelector('#mal-slider');
+const malValue = document.querySelector('#mal-value');
 
 // Store the last search results so we can restore them when user clicks back
 // I learned: Module-level variables persist across function calls!
@@ -47,18 +53,13 @@ function getCachedData() {
     // Check if cache is still fresh (less than 1 hour old)
     const age = Date.now() - timestamp;
     if (age < CACHE_DURATION) {
-      console.log(
-        `Using cached data (${Math.round(age / 1000 / 60)} minutes old)`
-      );
       return data;
     }
 
     // Cache expired, return null
-    console.log('Cache expired, fetching fresh data');
     return null;
-  } catch (error) {
+  } catch {
     // If parse fails, cache is corrupted - clear it
-    console.error('Cache corrupted, clearing:', error);
     localStorage.removeItem(CACHE_KEY);
     return null;
   }
@@ -78,10 +79,8 @@ function setCachedData(data) {
 
   try {
     localStorage.setItem(CACHE_KEY, JSON.stringify(cacheObject));
-    console.log('Data cached successfully');
-  } catch (error) {
-    // If storage is full, log the error but don't crash
-    console.error('Failed to cache data:', error);
+  } catch {
+    // If storage is full, silently fail but don't crash
   }
 }
 
@@ -114,7 +113,6 @@ async function fetchAnimeData() {
   }
 
   // Cache miss or expired - fetch from API
-  console.log('Fetching fresh data from API');
 
   // This is the path to my serverless function
   // Netlify automatically routes /.netlify/functions/api to netlify/functions/api.mjs
@@ -138,6 +136,125 @@ async function fetchAnimeData() {
 }
 
 /**
+ * Shows the loading spinner and hides the results list
+ * I learned: Managing loading states makes the app feel professional!
+ */
+function showLoadingSpinner() {
+  loadingSpinner.classList.remove('hidden');
+  resultsList.classList.add('hidden');
+}
+
+/**
+ * Hides the loading spinner and shows the results list
+ */
+function hideLoadingSpinner() {
+  loadingSpinner.classList.add('hidden');
+  resultsList.classList.remove('hidden');
+}
+
+/**
+ * Updates the cache age display with how old the cached data is
+ * I learned: Date.now() gives current time in milliseconds since 1970!
+ */
+function updateCacheAge() {
+  const cached = localStorage.getItem(CACHE_KEY);
+
+  if (!cached) {
+    cacheAgeDisplay.textContent = '';
+    return;
+  }
+
+  try {
+    const { timestamp } = JSON.parse(cached);
+    const ageMs = Date.now() - timestamp;
+    const ageMinutes = Math.round(ageMs / 1000 / 60);
+
+    if (ageMinutes < 1) {
+      cacheAgeDisplay.textContent = '✨ Fresh data!';
+    } else if (ageMinutes === 1) {
+      cacheAgeDisplay.textContent = '🕐 Data from 1 minute ago';
+    } else {
+      cacheAgeDisplay.textContent = `🕐 Data from ${ageMinutes} minutes ago`;
+    }
+  } catch {
+    cacheAgeDisplay.textContent = '';
+  }
+}
+
+/**
+ * Applies search and MAL score filters to the current results
+ * I learned: Client-side filtering is instant - no API call needed!
+ */
+function applyFilters() {
+  const searchTerm = searchInput.value.toLowerCase().trim();
+  const minScore = Number.parseFloat(malSlider.value);
+
+  // Start with the last search results
+  let filtered = [...lastResults];
+
+  // Apply search filter
+  if (searchTerm) {
+    filtered = filtered.filter((anime) =>
+      anime.name.toLowerCase().includes(searchTerm)
+    );
+  }
+
+  // Apply MAL score filter
+  if (minScore > 0) {
+    filtered = filtered.filter(
+      (anime) => anime.malScore && anime.malScore >= minScore
+    );
+  }
+
+  // Display filtered results
+  if (filtered.length === 0) {
+    showNoResults(resultsList);
+  } else {
+    showResults(filtered, resultsList);
+  }
+}
+
+/**
+ * Handles the refresh button click
+ * Clears cache and fetches fresh data
+ * I learned: Sometimes users WANT fresh data, even if cache exists!
+ */
+async function handleRefresh(event) {
+  event.preventDefault();
+
+  // Clear the cache
+  localStorage.removeItem(CACHE_KEY);
+
+  // Show loading spinner
+  showLoadingSpinner();
+
+  // Clear cache age display
+  cacheAgeDisplay.textContent = '';
+
+  try {
+    // Fetch fresh data (cache is empty so it will hit the API)
+    const data = await fetchAnimeData();
+    animeDataset = data.options;
+
+    // Update cache age display
+    updateCacheAge();
+
+    // If there were previous results, re-run the search with fresh data
+    // This was my breakthrough: preserve the user's filters!
+    if (lastResults.length > 0) {
+      // Trigger form submit to re-filter with fresh data
+      form.dispatchEvent(new Event('submit'));
+    } else {
+      hideLoadingSpinner();
+    }
+  } catch {
+    hideLoadingSpinner();
+    resultsList.textContent =
+      'Failed to refresh data. Please check your internet connection and try again.';
+  }
+}
+
+/**
  * Handles form submission - the main event!
  * This runs when the user clicks "Find My Anime!"
  *
@@ -158,9 +275,9 @@ async function handleFormSubmit(event) {
   // Without it, the form would submit and refresh the whole page
   event.preventDefault();
 
-  // Show loading message while fetching
-  // I learned: Users need feedback! Without this, they think the app is broken.
-  resultsList.textContent = 'Loading top anime from MyAnimeList...';
+  // Show loading spinner while fetching
+  // I learned: Users need feedback! The spinner is way better than plain text.
+  showLoadingSpinner();
 
   // Fetch the anime data from the serverless function
   // I learned: try/catch is REQUIRED for async operations - network can fail!
@@ -168,6 +285,9 @@ async function handleFormSubmit(event) {
     const data = await fetchAnimeData();
     // Store it globally so handleResultsClick can find anime by name
     animeDataset = data.options;
+
+    // Update cache age display
+    updateCacheAge();
 
     // Get all the form values
     // I learned the hard way that form values are ALWAYS strings!
@@ -198,11 +318,18 @@ async function handleFormSubmit(event) {
     // Find matching anime and display them!
     // I learned: Now I pass the data as a parameter instead of using a global!
     const recommendations = findRecommendations(preferences, data.options);
+
+    // Hide spinner before displaying results
+    hideLoadingSpinner();
+
     displayRecommendations(recommendations);
-  } catch (error) {
+
+    // Apply any active filters (search, MAL score)
+    // I learned: This lets filters persist across form submissions!
+    applyFilters();
+  } catch {
     // If fetch fails, show error in the DOM
-    // I learned: console.error is good for debugging, but users can't see the console!
-    console.error('Error fetching anime data:', error);
+    hideLoadingSpinner();
     resultsList.textContent =
       'Failed to load anime data. Please check your internet connection and try again.';
   }
@@ -334,3 +461,25 @@ function handleFormReset() {
 
 // Wire up the reset event
 form.addEventListener('reset', handleFormReset);
+
+// Wire up the refresh button
+// I learned: This gives users control over when to fetch fresh data!
+refreshButton.addEventListener('click', handleRefresh);
+
+// Wire up the search input for real-time filtering
+// I learned: The 'input' event fires on every keystroke!
+searchInput.addEventListener('input', function () {
+  applyFilters();
+});
+
+// Wire up the MAL score slider for real-time filtering
+// I learned: Update the display value and filter results as the slider moves!
+malSlider.addEventListener('input', function () {
+  const value = Number.parseFloat(malSlider.value);
+  malValue.textContent = `${value.toFixed(1)}+`;
+  applyFilters();
+});
+
+// Initialize cache age display on page load
+// I learned: Show cache age immediately if data is already cached!
+updateCacheAge();
