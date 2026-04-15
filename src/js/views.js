@@ -22,7 +22,7 @@ import {
  */
 function showResults(items, container) {
   // Clear any previous content
-  container.innerHTML = '';
+  container.textContent = '';
 
   // Show the count of results
   const countMessage = document.createElement('p');
@@ -33,13 +33,13 @@ function showResults(items, container) {
   } else {
     countMessage.textContent = `Found ${items.length} anime for you!`;
   }
-  container.appendChild(countMessage);
+  container.append(countMessage);
 
   // Create a card for each anime
   // I learned: for...of is perfect when I need to iterate through all items
   for (const anime of items) {
     const card = createAnimeCard(anime);
-    container.appendChild(card);
+    container.append(card);
   }
 
   // Add numbered badges to help users reference specific recommendations
@@ -52,14 +52,14 @@ function showResults(items, container) {
  */
 function showNoResults(container) {
   // Clear any previous content
-  container.innerHTML = '';
+  container.textContent = '';
 
   // Create and display the no results message
   const message = document.createElement('p');
   message.className = 'no-results';
   message.textContent =
     'No anime match your preferences. Try adjusting your filters! 📺';
-  container.appendChild(message);
+  container.append(message);
 }
 
 /**
@@ -69,7 +69,7 @@ function showNoResults(container) {
  */
 function showDetail(item, container) {
   // Clear any previous content
-  container.innerHTML = '';
+  container.textContent = '';
 
   // Create the detail view container
   const detailView = document.createElement('div');
@@ -84,13 +84,13 @@ function showDetail(item, container) {
   // Create the heading with emoji and name
   const heading = document.createElement('h2');
   heading.textContent = `${genreEmoji} ${item.name}`;
-  detailView.appendChild(heading);
+  detailView.append(heading);
 
   // Create the description paragraph
   const descriptionP = document.createElement('p');
   descriptionP.className = 'description';
   descriptionP.textContent = description;
-  detailView.appendChild(descriptionP);
+  detailView.append(descriptionP);
 
   // Create the details container with ALL the properties
   const detailsDiv = document.createElement('div');
@@ -102,35 +102,31 @@ function showDetail(item, container) {
     const p = document.createElement('p');
     const strong = document.createElement('strong');
     strong.textContent = `${label}: `;
-    p.appendChild(strong);
-    p.appendChild(document.createTextNode(value));
+    p.append(strong);
+    p.append(document.createTextNode(value));
     return p;
   }
 
   // Add all the detail paragraphs
-  detailsDiv.appendChild(createDetailParagraph('Genre', item.genre));
-  detailsDiv.appendChild(createDetailParagraph('Mood', item.mood));
-  detailsDiv.appendChild(
+  detailsDiv.append(createDetailParagraph('Genre', item.genre));
+  detailsDiv.append(createDetailParagraph('Mood', item.mood));
+  detailsDiv.append(
     createDetailParagraph('Audio Language', item.audioLanguage)
   );
-  detailsDiv.appendChild(createDetailParagraph('Content Rating', item.rating));
-  detailsDiv.appendChild(
-    createDetailParagraph('Status', item.completionStatus)
-  );
-  detailsDiv.appendChild(
-    createDetailParagraph('Total Episodes', episodeDisplay)
-  );
-  detailsDiv.appendChild(
+  detailsDiv.append(createDetailParagraph('Content Rating', item.rating));
+  detailsDiv.append(createDetailParagraph('Status', item.completionStatus));
+  detailsDiv.append(createDetailParagraph('Total Episodes', episodeDisplay));
+  detailsDiv.append(
     createDetailParagraph(
       'Episode Length',
       `${item.episodeLengthMinutes} minutes`
     )
   );
-  detailsDiv.appendChild(
+  detailsDiv.append(
     createDetailParagraph('My Rating', `${stars} (${item.userRating}/5)`)
   );
 
-  detailView.appendChild(detailsDiv);
+  detailView.append(detailsDiv);
 
   // Create the back button
   // I learned: Setting an id makes it easier to find this button for event handling
@@ -138,10 +134,10 @@ function showDetail(item, container) {
   backButton.textContent = '← Back to Results';
   backButton.className = 'btn-back';
   backButton.id = 'back-to-results';
-  detailView.appendChild(backButton);
+  detailView.append(backButton);
 
   // Add the detail view to the container
-  container.appendChild(detailView);
+  container.append(detailView);
 }
 
 /**
@@ -171,7 +167,7 @@ function createAnimeCard(anime) {
   // Create the heading with emoji and name
   const heading = document.createElement('h3');
   heading.textContent = `${genreEmoji} ${anime.name}`;
-  card.appendChild(heading);
+  card.append(heading);
 
   // Create the details container
   const detailsDiv = document.createElement('div');
@@ -184,37 +180,35 @@ function createAnimeCard(anime) {
     const p = document.createElement('p');
     const strong = document.createElement('strong');
     strong.textContent = `${label}: `;
-    p.appendChild(strong);
+    p.append(strong);
     // This part creates a text node for the value
-    p.appendChild(document.createTextNode(value));
+    p.append(document.createTextNode(value));
     return p;
   }
 
   // Add all the detail paragraphs
-  detailsDiv.appendChild(createDetailParagraph('Genre', anime.genre));
-  detailsDiv.appendChild(createDetailParagraph('Mood', anime.mood));
-  detailsDiv.appendChild(createDetailParagraph('Audio', anime.audioLanguage));
-  detailsDiv.appendChild(createDetailParagraph('Rating', anime.rating));
-  detailsDiv.appendChild(
-    createDetailParagraph('Status', anime.completionStatus)
-  );
-  detailsDiv.appendChild(
+  detailsDiv.append(createDetailParagraph('Genre', anime.genre));
+  detailsDiv.append(createDetailParagraph('Mood', anime.mood));
+  detailsDiv.append(createDetailParagraph('Audio', anime.audioLanguage));
+  detailsDiv.append(createDetailParagraph('Rating', anime.rating));
+  detailsDiv.append(createDetailParagraph('Status', anime.completionStatus));
+  detailsDiv.append(
     createDetailParagraph(
       'Length',
       `${episodeDisplay} (${anime.episodeLengthMinutes} min each)`
     )
   );
-  detailsDiv.appendChild(
+  detailsDiv.append(
     createDetailParagraph('My Rating', `${stars} (${anime.userRating}/5)`)
   );
 
-  card.appendChild(detailsDiv);
+  card.append(detailsDiv);
 
   // Create the description paragraph
   const descriptionP = document.createElement('p');
   descriptionP.className = 'description';
   descriptionP.textContent = description;
-  card.appendChild(descriptionP);
+  card.append(descriptionP);
 
   return card;
 }
@@ -229,7 +223,7 @@ function addCardBadges() {
 
   // Add a numbered badge to each card
   // I learned: forEach is perfect here since I need to process every card
-  cards.forEach((card, index) => {
+  for (const [index, card] of cards.entries()) {
     const badge = document.createElement('span');
     badge.textContent = `#${index + 1}`;
     badge.className = 'card-badge';
@@ -237,7 +231,7 @@ function addCardBadges() {
     // prepend adds it as the FIRST child (before the h3)
     // This was my breakthrough: prepend vs append changes position!
     card.prepend(badge);
-  });
+  }
 }
 
 // Export the three main view functions

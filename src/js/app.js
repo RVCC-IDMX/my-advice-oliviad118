@@ -122,13 +122,24 @@ function displayRecommendations(recommendations) {
 }
 
 /**
- * Handles clicks on recommendation cards
- * Uses event delegation - one listener on the container handles all card clicks!
+ * Handles clicks on recommendation cards AND the back button
+ * Uses event delegation - one listener handles both types of clicks!
  *
  * I learned: Event delegation is more efficient than adding listeners to every card.
  * The click bubbles up from the card to the container, and we can catch it there.
  */
-function handleCardClick(event) {
+function handleResultsClick(event) {
+  // Check if the click was on the back button first
+  if (event.target.id === 'back-to-results') {
+    // Restore the last results
+    // I learned: lastResults persists because it's a module-level variable!
+    if (lastResults.length > 0) {
+      showResults(lastResults, resultsList);
+    }
+    return;
+  }
+
+  // Otherwise, check if it was on a recommendation card
   // Find the closest .recommendation-card ancestor
   // This works even if the user clicks on text inside the card!
   const card = event.target.closest('.recommendation-card');
@@ -150,27 +161,9 @@ function handleCardClick(event) {
   }
 }
 
-/**
- * Handles clicks on the back button in detail view
- * Restores the last search results
- *
- * I learned: We can check event.target.id to see what was clicked!
- */
-function handleBackClick(event) {
-  // Only respond to clicks on the back button
-  if (event.target.id === 'back-to-results') {
-    // Restore the last results
-    // I learned: lastResults persists because it's a module-level variable!
-    if (lastResults.length > 0) {
-      showResults(lastResults, resultsList);
-    }
-  }
-}
-
-// Add event delegation listeners to the results container
+// Add ONE event delegation listener to the results container
 // I learned: One listener handles both card clicks AND back button clicks!
-resultsList.addEventListener('click', handleCardClick);
-resultsList.addEventListener('click', handleBackClick);
+resultsList.addEventListener('click', handleResultsClick);
 
 // I made the mistake of forgetting to handle the reset button at first!
 // When the user clicks "Clear All Filters", I want to also clear the results
@@ -182,9 +175,16 @@ function handleFormReset() {
   // A small delay lets the form reset first, then we clear results
   // I learned: setTimeout with 0ms pushes this to the end of the event queue!
   setTimeout(function () {
-    // Safe: innerHTML with hardcoded string, zero variables, no data insertion
-    resultsList.innerHTML =
-      '<p class="placeholder">Choose your preferences and click "Find My Anime!" to discover your next obsession! 🎌</p>';
+    // Clear the container
+    resultsList.textContent = '';
+
+    // Create the placeholder message using safe DOM methods
+    const placeholder = document.createElement('p');
+    placeholder.className = 'placeholder';
+    placeholder.textContent =
+      'Choose your preferences and click "Find My Anime!" to discover your next obsession! 🎌';
+    resultsList.append(placeholder);
+
     // Clear the stored results too
     lastResults = [];
   }, 0);

@@ -74,8 +74,9 @@ Look through your app.js for any `addEventListener` calls. List each one.
 
 | Where in the code | Event type | What it does |
 | ----------------- | ---------- | ------------ |
-| Line ~26 on `form` | `submit` | Prevents default, gathers form values, filters anime, displays results |
-| Line ~210 on `form` | `reset` | Clears results and shows placeholder message when user clicks "Clear All Filters" |
+| Line 75 on `form` | `submit` | Prevents default, gathers form values, filters anime, displays results |
+| Line 166 on `resultsList` | `click` | Delegates all clicks - routes to card detail view OR back button based on what was clicked |
+| Line 193 on `form` | `reset` | Clears results and shows placeholder message when user clicks "Clear All Filters" |
 
 If you do not see any `addEventListener` calls, write "none found" — and then look again, because the form handler uses one.
 
