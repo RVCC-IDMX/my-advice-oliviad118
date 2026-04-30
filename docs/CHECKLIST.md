@@ -1,76 +1,48 @@
-# Completion checklist — Week 4: Fetch, serverless, and live data
+# Final project — checklist
 
-Use this checklist to make sure you have completed every part of the assignment. Each item should be a clear yes or no.
+Tick each item as you ship it. Items in the **Optional ceiling** section are not required.
 
-## Part 0 — Merge, install, and meet your new linter
+## Setup
 
-- [ ] Merged the Week 4 PR
-- [ ] Ran `npm install` — saw preinstall and postinstall messages
-- [ ] Deleted `.eslintrc.cjs` (replaced by `eslint.config.js`)
-- [ ] Ran `npm run lint` — noted violations from new unicorn rules
-- [ ] Read `docs/tutorials/what-are-hooks.md`
-- [ ] Read `docs/tutorials/harness-engineering.md`
-- [ ] Read `docs/reference/safe-dom-manipulation.md` (updated — innerHTML now blocked by linter)
-- [ ] Fixed lint violations (used `--fix` where possible, manual fixes where needed)
-- [ ] Logged lint fixes in `docs/error-log.md`
-- [ ] Updated AGENTS.md with async/fetch rules and enforcement layer notes
-- [ ] Ran `npm run dev:api` and visited `http://localhost:8888/.netlify/functions/api` — saw Dog API JSON
-- [ ] Ran `npm run lint` — passes
+- [ ] My `GROQ_API_KEY` is stored only in my password manager and in Netlify's environment variables — never pasted into an AI chat (Copilot, Claude, ChatGPT, etc.), never written to a `.env` file as plain text, never committed to source.
+- [ ] If my key was ever exposed, I have cycled it and updated Netlify.
+- [ ] `GROQ_API_KEY` set in this project's Netlify environment variables; the deployed function returns Groq responses end-to-end.
+- [ ] Env var requirement documented in `README.md`.
 
-## Part 1 — Serverless proxy
+## Architecture choice
 
-- [ ] Read `docs/tutorials/your-first-serverless-function.md` and your API guide in `docs/api-guides/`
-- [ ] Replaced hardcoded Dog API data with a fetch to my project's API
-- [ ] Serverless function transforms API response to match my views' expected shape
-- [ ] try/catch around the API call with 502 error response on failure
-- [ ] Checks response.ok before parsing upstream response
-- [ ] If API key needed: `.env` file created with the key, accessed via `process.env`
-- [ ] `npm run dev:api` → `http://localhost:8888/.netlify/functions/api` shows my API data in the right shape
-- [ ] Ran `npm run lint` — passes
+- [ ] Pattern picked (A, B, or A+B); reasoning written down in `docs/reflections/final-project-reflection.md`.
 
-## Part 2 — Fetch and render
+## Moderation floor (all four required)
 
-- [ ] Replaced `import { data }` with async fetch to `/.netlify/functions/api`
-- [ ] View functions receive fetched data and render cards
-- [ ] Loading state visible while data loads
-- [ ] try/catch around fetch with response.ok check
-- [ ] Error message appears in the DOM on fetch failure (not just console.log)
-- [ ] Cards render from live API data (same look as before, different source)
-- [ ] Ran `npm run lint` — passes
+- [ ] System prompt defined as a named constant in the serverless function.
+- [ ] Structured output: `response_format: { type: "json_object" }` set on the Groq call.
+- [ ] User input wrapped in `<user_input>...</user_input>` inside the prompt.
+- [ ] Input length cap enforced before the Groq call (suggested: 500 characters).
 
-## Part 3A — Enrich your views
+## Schema
 
-- [ ] Added 1-2 new fields from the API that data.js didn't have
-- [ ] Updated serverless function to include new field(s)
-- [ ] Updated views.js to display new data
-- [ ] Defensive rendering: missing fields don't crash the app
-- [ ] New data visible in cards or detail view
-- [ ] Ran `npm run lint` — passes
+- [ ] Response schema defined and documented (in code comments or a note in `docs/`).
+- [ ] Front-end handles the `refused: true` branch — renders only `refusal_reason`, never `commentary`.
 
-## Part 3B — Cache with localStorage
+## Integration
 
-- [ ] loadCache and saveCache functions use try/catch wrapper pattern
-- [ ] API response cached after successful fetch
-- [ ] Page load checks cache first, fetches only if cache is empty or invalid
-- [ ] Shape validation on cached data
-- [ ] Self-heals on corrupt cache data (removes bad entry, falls back to fetch)
-- [ ] Tested: refresh loads from cache, clear cache triggers re-fetch, offline mode works
-- [ ] Ran `npm run lint` — passes
+- [ ] One Groq call + one REST call per user request (or two Groq + one REST if A+B).
+- [ ] Existing Week 4 transform and `views.js` render path still work end-to-end.
+- [ ] No new innerHTML; `createElement` + `textContent` discipline preserved.
 
-## Part 4 — Deploy and reflect
+## Polish
 
-- [ ] If API key needed: environment variable set in Netlify UI
-- [ ] Deployed to Netlify with `netlify deploy --prod`
-- [ ] Deployed site shows API data correctly
-- [ ] Filled out `docs/my-code-map-v2-additions.md`
-- [ ] Completed `docs/reflections/week-4-reflection.md`
-- [ ] Ran `npm run lint` — passes
-- [ ] Ran `npm run build` — builds successfully
-- [ ] Pushed to GitHub
-- [ ] GitHub Actions lint check shows green
+- [ ] At least one UX rough edge identified and smoothed (loading state, error state, refusal rendering, layout, copy, accessibility).
+- [ ] Live site at your Netlify URL works end-to-end after deploy.
 
-## What to submit
+## Wrap
 
-- [ ] Live Netlify URL
-- [ ] GitHub repo URL
-- [ ] 2-3 sentence Canvas answer: What is the enforcement ladder, and which layer changed your coding habits the most this week?
+- [ ] `README.md` updated to describe the Groq integration.
+- [ ] `docs/reflections/final-project-reflection.md` completed.
+- [ ] All work merged to `main` and verified live before the deadline.
+
+## Optional ceiling (recommended for students with time, not required)
+
+- [ ] Cheap deterministic block-list for known injection signatures (~10 lines, see `docs/reference/groq-prompt-injection-defenses.md`).
+- [ ] Optional zeroth Groq call returning `{ on_topic: bool, safe: bool }` before the main call (~20 lines, see same reference).
