@@ -13,6 +13,29 @@
     </header>
 
     <main>
+      <!-- NEW: Natural language search (Pattern A) -->
+      <section class="ai-search-section">
+        <h2>✨ Describe what you're looking for</h2>
+        <p class="ai-search-subtitle">
+          Try: "something chill to watch before bed" or "intense action with
+          high stakes"
+        </p>
+        <form id="ai-search-form">
+          <div class="ai-search-input-group">
+            <input
+              type="text"
+              id="ai-search-input"
+              name="ai-search"
+              placeholder="Describe the type of anime you want..."
+              maxlength="500"
+              autocomplete="off"
+            />
+            <button type="submit" class="btn-ai-search">🤖 AI Search</button>
+          </div>
+        </form>
+        <p class="search-divider">— or use the detailed form below —</p>
+      </section>
+
       <section class="form-section">
         <h2>Tell me your preferences</h2>
         <form id="anime-form">
@@ -166,6 +189,11 @@
         <div id="loading-spinner" class="spinner" hidden>
           <div class="spinner-ring"></div>
           <p>Loading top anime from MyAnimeList...</p>
+        </div>
+
+        <!-- AI narration (Pattern B) - appears after results load -->
+        <div id="ai-narration" class="ai-narration" hidden>
+          <p id="ai-narration-text"></p>
         </div>
 
         <div id="recommendation-list">

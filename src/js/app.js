@@ -484,3 +484,189 @@ malSlider.addEventListener('input', function () {
 // Initialize cache age display on page load
 // I learned: Show cache age immediately if data is already cached!
 updateCacheAge();
+
+/*
+ * ============================================================
+ * NEW: Groq AI Integration (Pattern A + B)
+ * ============================================================
+ * Pattern A: Translate natural language → anime filter criteria
+ * Pattern B: Narrate results → personalized introduction
+ *
+ * I learned: Groq makes the app feel conversational and smart!
+ */
+
+// Get references to the new AI elements
+const aiSearchForm = document.querySelector('#ai-search-form');
+const aiSearchInput = document.querySelector('#ai-search-input');
+const aiNarration = document.querySelector('#ai-narration');
+const aiNarrationText = document.querySelector('#ai-narration-text');
+
+/**
+ * Calls the Groq serverless function
+ *
+ * @param {string} mode - "translate" (Pattern A) or "narrate" (Pattern B)
+ * @param {Object} payload - Data to send to Groq
+ * @returns {Promise<Object>} - Groq's response
+ */
+async function callGroqFunction(mode, payload) {
+  const response = await fetch('/.netlify/functions/groq', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ mode, ...payload }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || 'Groq API error');
+  }
+
+  return response.json();
+}
+
+/**
+ * Pattern A: Translate user's natural language input into filter criteria
+ * Example: "something chill before bed" → { mood: "relaxing", maxEpisodeLength: 25 }
+ *
+ * @param {string} userInput - The natural language string from the user
+ * @returns {Promise<Object>} - The translated filter object
+ */
+async function translateUserInput(userInput) {
+  const result = await callGroqFunction('translate', { userInput });
+
+  // Check if Groq returned an error (inappropriate input, etc.)
+  if (result.filters.error) {
+    throw new Error(result.filters.error);
+  }
+
+  return result.filters;
+}
+
+/**
+ * Pattern B: Generate personalized narration for results
+ * Takes the preferences and matched anime, returns a friendly intro
+ *
+ * @param {Object} preferences - User's preferences (translated or from form)
+ * @param {Array} animeMatches - Array of matched anime objects
+ * @returns {Promise<string>} - The personalized narration text
+ */
+async function narrateResults(preferences, animeMatches) {
+  // Only send the top 5 matches to keep it concise
+  const topMatches = animeMatches.slice(0, 5);
+
+  const result = await callGroqFunction('narrate', {
+    preferences,
+    animeMatches: topMatches,
+  });
+
+  return result.narration;
+}
+
+/**
+ * Handles AI search form submission (Pattern A + B combined)
+ *
+ * Flow:
+ * 1. User types "something chill before bed"
+ * 2. Pattern A: Groq translates to { mood: "relaxing", maxEpisodeLength: 25 }
+ * 3. Search anime with those filters
+ * 4. Pattern B: Groq writes: "Perfect for winding down! Here are 3 cozy anime..."
+ * 5. Display narration + anime cards
+ *
+ * I learned: This is where the magic happens - natural language → recommendations!
+ */
+async function handleAISearch(event) {
+  event.preventDefault();
+
+  const userInput = aiSearchInput.value.trim();
+
+  // Validation: don't submit if empty
+  if (!userInput) {
+    return;
+  }
+
+  // Hide any previous narration
+  aiNarration.hidden = true;
+
+  // Show loading spinner
+  showLoadingSpinner();
+
+  try {
+    // Step 1: Fetch anime data (same as regular form)
+    const data = await fetchAnimeData();
+    animeDataset = data.options;
+    updateCacheAge();
+
+    // Step 2 (Pattern A): Translate user's natural language → filters
+    // I learned: This is what makes the app feel intelligent!
+    const translatedFilters = await translateUserInput(userInput);
+
+    // Step 3: Find matching anime using the translated filters
+    const recommendations = findRecommendations(
+      translatedFilters,
+      data.options
+    );
+
+    // Hide spinner
+    hideLoadingSpinner();
+
+    // Step 4: Check if we found any matches
+    if (recommendations.length === 0) {
+      displayRecommendations([]);
+      aiNarration.hidden = true;
+      aiSearchInput.value = ''; // Clear input
+      return;
+    }
+
+    // Step 5 (Pattern B): Generate personalized narration
+    // I learned: Groq makes the recommendations feel more human!
+    const narration = await narrateResults(translatedFilters, recommendations);
+
+    // Step 6: Display the narration
+    aiNarrationText.textContent = narration;
+    aiNarration.hidden = false;
+
+    // Step 7: Display the anime cards
+    displayRecommendations(recommendations);
+
+    // Step 8: Apply any active filters (search, MAL score)
+    applyFilters();
+
+    // Clear the AI search input for next search
+    aiSearchInput.value = '';
+  } catch (error) {
+    // Handle errors gracefully
+    hideLoadingSpinner();
+    aiNarration.hidden = true;
+
+    // Show error in results area
+    // I learned: Use createElement + textContent instead of innerHTML for safety!
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error-message';
+    errorDiv.style.padding = 'var(--spacing-lg)';
+    errorDiv.style.backgroundColor = 'hsl(0, 70%, 95%)';
+    errorDiv.style.borderLeft = '4px solid var(--color-primary-red)';
+    errorDiv.style.borderRadius = 'var(--radius-sm)';
+    errorDiv.style.color = 'var(--color-text)';
+
+    const errorTitle = document.createElement('p');
+    errorTitle.style.margin = '0';
+    errorTitle.style.fontWeight = '600';
+    errorTitle.textContent = `❌ ${error.message}`;
+
+    const errorHint = document.createElement('p');
+    errorHint.style.marginTop = 'var(--spacing-xs)';
+    errorHint.style.fontSize = '0.9rem';
+    errorHint.style.color = 'var(--color-text-light)';
+    errorHint.textContent =
+      'Try being more specific about the type of anime you want, or use the form below.';
+
+    errorDiv.append(errorTitle, errorHint);
+
+    // Clear results and show error
+    resultsList.textContent = '';
+    resultsList.append(errorDiv);
+  }
+}
+
+// Wire up the AI search form
+// I learned: This makes the whole Pattern A + B flow work!
+aiSearchForm.addEventListener('submit', handleAISearch);
