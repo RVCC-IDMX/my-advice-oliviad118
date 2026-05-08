@@ -144,7 +144,10 @@ export default async () => {
   try {
     // Fetch top anime from Jikan API
     // I learned: Using /top/anime gives us popular, quality anime with good data
-    const response = await fetch('https://api.jikan.moe/v4/top/anime?limit=25');
+    // Increased to 100 to ensure better genre coverage - the top 25 had no fantasy/sports as primary genres!
+    const response = await fetch(
+      'https://api.jikan.moe/v4/top/anime?limit=100'
+    );
 
     // I learned: fetch() doesn't throw on 404 or 500 - I have to check response.ok myself!
     if (!response.ok) {
@@ -172,6 +175,12 @@ export default async () => {
           anime.genres && anime.genres.length > 0
             ? anime.genres[0].name.toLowerCase()
             : 'action',
+        // Store ALL genres so we can match any of them
+        // I learned: Jikan anime have multiple genres - checking only the first one was too limiting!
+        allGenres:
+          anime.genres && anime.genres.length > 0
+            ? anime.genres.map((g) => g.name.toLowerCase())
+            : ['action'],
         mood: mapGenreToMood(anime.genres),
         audioLanguage: 'both', // Most anime have both sub and dub
         rating: mapRating(anime.rating),

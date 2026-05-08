@@ -24,6 +24,14 @@
 function matchesGenre(anime, desiredGenre) {
   // Empty string means "any genre is fine"
   if (!desiredGenre) return true;
+
+  // Check if the desired genre is in ANY of the anime's genres
+  // I learned: Anime often have multiple genres, so checking just the first one was too limiting!
+  if (anime.allGenres && anime.allGenres.includes(desiredGenre)) {
+    return true;
+  }
+
+  // Fallback: check primary genre for backwards compatibility
   return anime.genre === desiredGenre;
 }
 
