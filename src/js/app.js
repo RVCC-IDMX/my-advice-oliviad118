@@ -138,18 +138,19 @@ async function fetchAnimeData() {
 /**
  * Shows the loading spinner and hides the results list
  * I learned: Managing loading states makes the app feel professional!
+ * Using HTML hidden attribute instead of CSS class - more reliable and modern!
  */
 function showLoadingSpinner() {
-  loadingSpinner.classList.remove('hidden');
-  resultsList.classList.add('hidden');
+  loadingSpinner.hidden = false;
+  resultsList.hidden = true;
 }
 
 /**
  * Hides the loading spinner and shows the results list
  */
 function hideLoadingSpinner() {
-  loadingSpinner.classList.add('hidden');
-  resultsList.classList.remove('hidden');
+  loadingSpinner.hidden = true;
+  resultsList.hidden = false;
 }
 
 /**
