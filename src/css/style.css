@@ -348,6 +348,11 @@ main {
   gap: var(--spacing-md);
 }
 
+/* Ensure spinner respects the hidden attribute */
+.spinner[hidden] {
+  display: none;
+}
+
 .spinner-ring {
   width: 60px;
   height: 60px;
