@@ -1,17 +1,60 @@
-# My Advice
+# My Advice - Anime Finder
 
-This repo gives you a fully configured professional tooling setup. Your job is to use an AI agent conversation to plan and build your personal "What Should I...?" site inside it.
+An intelligent anime recommendation app that helps you find the perfect anime to watch! Search using natural language powered by Groq AI, or use the detailed filter form to browse 100 top-rated anime from MyAnimeList.
 
-The tooling is already here — linting, formatting, pre-commit hooks, CI, and a dev server. You bring the site.
+## ✨ Features
+
+### 🤖 AI-Powered Search (Pattern A + B)
+- **Natural Language Input**: Type "something chill before bed" and let Groq translate it to filters
+- **Personalized Narration**: Get a friendly 2-3 sentence intro explaining why these anime match your request
+- Built with safety: input validation, JSON mode, delimited user input, system prompts
+
+### 🎯 Detailed Filtering
+- Search by genre, mood, audio language, rating, completion status
+- Filter by episode count and episode length
+- Real-time search and MAL score slider
+- View full details for any anime
+
+### ⚡ Performance
+- localStorage caching with 1-hour expiry
+- Serverless functions for API proxying
+- 100 top anime from Jikan (MyAnimeList) API
+
+This repo uses a fully configured professional tooling setup with linting, formatting, pre-commit hooks, CI, and Netlify deployment.
 
 ## Getting started
 
+1. **Install dependencies**:
 ```bash
 npm install
-npm run dev
 ```
 
-After `npm install`, Husky sets up pre-commit hooks automatically. Running `npm run dev` starts the Vite dev server — you should see a placeholder page in the browser.
+2. **Set up Groq API key** (required for AI features):
+   - Get a free API key at [console.groq.com](https://console.groq.com)
+   - Create a `.env` file in the project root:
+   ```
+   GROQ_API_KEY=your_key_here
+   ```
+   - ⚠️ Never commit `.env` to git - it's in `.gitignore`
+
+3. **Start the dev server**:
+```bash
+npm run dev
+# OR for serverless functions:
+npx netlify dev
+```
+
+After `npm install`, Husky sets up pre-commit hooks automatically. The Netlify dev server runs both Vite (frontend) and serverless functions (API + Groq).
+
+## Tech Stack
+
+- **Frontend**: Vanilla JavaScript (ES modules), Vite 7.3.3
+- **APIs**: Jikan (MyAnimeList), Groq (llama-3.3-70b-versatile)
+- **Serverless**: Netlify Functions (ESM)
+- **Storage**: localStorage with TTL caching
+- **Linting**: ESLint 9 + unicorn plugin
+- **Formatting**: Prettier
+- **CI/CD**: GitHub Actions → Netlify
 
 ## Learning objectives
 
@@ -47,8 +90,30 @@ Your docs folder has everything you need:
 - [docs/course/how-agents-md-and-reflections-work.md](docs/course/how-agents-md-and-reflections-work.md) — how AGENTS.md and weekly reflections work across the project
 - [docs/course/weekly-updates-how-it-works.md](docs/course/weekly-updates-how-it-works.md) — how you receive weekly instruction updates via GitHub PRs
 
-## Where your site lives
+## Project Structure
 
-The `src/` folder is where your generated site's code will go. Your AI agent conversation will create files like `src/js/data.js`, `src/js/matching.js`, and `src/js/app.js`, plus `src/css/style.css` for your styles.
+```
+src/
+  js/
+    app.js          # DOM wiring, event handlers, API calls
+    data.js         # Static anime dataset (deprecated, now uses API)
+    matching.js     # Filter logic (no DOM)
+    views.js        # View rendering functions
+    greeting.js     # Time-based greeting helper
+  css/
+    style.css       # All styles with CSS custom properties
+  images/           # Image assets
 
-A placeholder `index.html` is included so the project builds and runs from the start. Your AI agent conversation will replace it with your real site.
+netlify/functions/
+  api.mjs           # Jikan API proxy (transforms data)
+  groq.mjs          # Groq AI integration (Pattern A + B)
+
+docs/               # Tutorials, references, guides
+index.html          # Main HTML structure
+```
+
+The app follows **separation of concerns**:
+- **Logic** (matching.js) - Pure functions, no DOM
+- **Views** (views.js) - Rendering functions  
+- **DOM** (app.js) - Event handlers, wiring
+- **Serverless** - API proxying and AI integration
